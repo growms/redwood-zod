@@ -28,6 +28,8 @@ export const updateUserExample: MutationResolvers['updateUserExample'] = ({
   id,
   input,
 }) => {
+  validateWithZod(input, userExampleSchema)
+
   return db.userExample.update({
     data: input,
     where: { id },
