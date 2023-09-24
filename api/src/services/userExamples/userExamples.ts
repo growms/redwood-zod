@@ -1,6 +1,8 @@
 import type { QueryResolvers, MutationResolvers } from 'types/graphql'
 
+import { userExampleSchema } from 'src/lib/common/zod'
 import { db } from 'src/lib/db'
+import { validateWithZod } from 'src/lib/zodValidation'
 
 export const userExamples: QueryResolvers['userExamples'] = () => {
   return db.userExample.findMany()
@@ -15,6 +17,8 @@ export const userExample: QueryResolvers['userExample'] = ({ id }) => {
 export const createUserExample: MutationResolvers['createUserExample'] = ({
   input,
 }) => {
+  validateWithZod(input, userExampleSchema)
+
   return db.userExample.create({
     data: input,
   })

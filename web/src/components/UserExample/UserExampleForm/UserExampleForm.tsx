@@ -1,3 +1,6 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import type { EditUserExampleById, UpdateUserExampleInput } from 'types/graphql'
+
 import {
   Form,
   FormError,
@@ -5,10 +8,11 @@ import {
   Label,
   TextField,
   Submit,
+  useForm,
 } from '@redwoodjs/forms'
-
-import type { EditUserExampleById, UpdateUserExampleInput } from 'types/graphql'
 import type { RWGqlError } from '@redwoodjs/forms'
+
+import { userExampleSchema } from 'src/lib/common/zod'
 
 type FormUserExample = NonNullable<EditUserExampleById['userExample']>
 
@@ -20,13 +24,21 @@ interface UserExampleFormProps {
 }
 
 const UserExampleForm = (props: UserExampleFormProps) => {
+  const formMethods = useForm<FormUserExample>({
+    resolver: zodResolver(userExampleSchema),
+  })
+
   const onSubmit = (data: FormUserExample) => {
     props.onSave(data, props?.userExample?.id)
   }
 
   return (
     <div className="rw-form-wrapper">
-      <Form<FormUserExample> onSubmit={onSubmit} error={props.error}>
+      <Form<FormUserExample>
+        onSubmit={onSubmit}
+        formMethods={formMethods}
+        error={props.error}
+      >
         <FormError
           error={props.error}
           wrapperClassName="rw-form-error-wrapper"
