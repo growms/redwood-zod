@@ -1,5 +1,7 @@
 import type { UserExample } from '@prisma/client'
 
+import { ZodValidationError } from 'src/lib/zodValidation'
+
 import {
   userExamples,
   userExample,
@@ -31,13 +33,40 @@ describe('userExamples', () => {
     }
   )
 
-  scenario('creates a userExample', async () => {
-    const result = await createUserExample({
-      input: { email: 'String1484848' },
-    })
+  scenario(
+    'creates a userExample with valid email and non-empty name',
+    async () => {
+      // Test that email must be valid
+      await expect(async () => {
+        return await createUserExample({
+          input: { email: 'String1484848as', name: 'John' },
+        })
+      }).rejects.toThrow(ZodValidationError)
 
-    expect(result.email).toEqual('String1484848')
-  })
+      // Test that email must not be empty
+      await expect(async () => {
+        return await createUserExample({
+          input: { email: '', name: 'John' },
+        })
+      }).rejects.toThrow(ZodValidationError)
+
+      // Test that name must not be empty
+      await expect(async () => {
+        return await createUserExample({
+          input: { email: 'johndoe@example.com', name: '' },
+        })
+      }).rejects.toThrow(ZodValidationError)
+
+      // Test with valid email and non-empty name
+      const validResult = await createUserExample({
+        input: { email: 'johndoe@example.com', name: 'John' },
+      })
+
+      // Assert that the result has the expected email and name
+      expect(validResult.email).toEqual('johndoe@example.com')
+      expect(validResult.name).toEqual('John')
+    }
+  )
 
   scenario('updates a userExample', async (scenario: StandardScenario) => {
     const original = (await userExample({
