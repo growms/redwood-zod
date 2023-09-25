@@ -20,6 +20,7 @@ const Routes = () => {
         <Route path="/user-examples/{id:Int}" page={UserExampleUserExamplePage} name="userExample" />
         <Route path="/user-examples" page={UserExampleUserExamplesPage} name="userExamples" />
       </Set>
+      <Route path="/" redirect="/user-examples" />
       <Route notfound page={NotFoundPage} />
     </Router>
   )
